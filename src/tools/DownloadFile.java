@@ -1,12 +1,14 @@
 package tools;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import tools.StuInfo.Student;
@@ -54,12 +56,21 @@ public class DownloadFile {
 		InputStream in = null;
 		BufferedOutputStream out = null;
 		try {
-			byte[] temp = new byte[1024 * 4];
+			int cacheSize = Integer.parseInt(StuInfo.prop.getProperty("cacheSize"));
+			byte[] temp = new byte[1024 * cacheSize];
 			out = new BufferedOutputStream(new FileOutputStream(f));
-			in = url.openConnection().getInputStream();
-			while (in.read(temp) != -1) {
-				out.write(temp);
+			URLConnection conn = url.openConnection();
+
+			in = conn.getInputStream();
+			int all = conn.getContentLength();
+			long sm = 0;
+			int len = 0;
+			while ((len = in.read(temp)) != -1) {
+				out.write(temp, 0, len);
+				sm += len;
+				LogRecord.printProcess(f.getName(), (double) sm / all);
 			}
+			LogRecord.reset();
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

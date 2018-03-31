@@ -39,7 +39,6 @@ public class StuInfo {
 			client.getOptions().setRedirectEnabled(true);
 			client.getCookieManager().setCookiesEnabled(true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
